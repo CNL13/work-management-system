@@ -74,10 +74,13 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "https://work-management-frontend.vercel.app"
+              )
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // ✅ CẦN CHO SIGNALR
+              .AllowCredentials();
     });
 });
 
@@ -148,14 +151,10 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        context.Database.ExecuteSqlRaw(@"
-            IF NOT EXISTS (SELECT * FROM sys.columns 
-                           WHERE object_id = OBJECT_ID(N'[dbo].[Users]') 
-                           AND name = 'JoinedUnitAt')
-            BEGIN
-                ALTER TABLE [dbo].[Users] ADD [JoinedUnitAt] DATETIME2 NOT NULL DEFAULT '2026-01-01';
-            END
-        ");
+        context.Database.ExecuteSqlRaw("""
+            ALTER TABLE "Users"
+            ADD COLUMN IF NOT EXISTS "JoinedUnitAt" timestamp without time zone NOT NULL DEFAULT '2026-01-01';
+        """);
     }
     catch (Exception ex)
     {
@@ -178,6 +177,7 @@ app.UseSwaggerUI();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapHub<DiscussionHub>("/discussionHub"); 
+app.MapHub<DiscussionHub>("/discussionHub");
+app.MapGet("/", () => "WorkManagement API is running");
 
 app.Run();
