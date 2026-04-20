@@ -76,7 +76,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:5173",
-                "https://work-management-frontend.vercel.app"
+                "https://work-management-frontend-ebon.vercel.app",
+                "https://work-management-frontend-hnq1fm4ra-cnl13s-projects.vercel.app"
               )
               .AllowAnyHeader()
               .AllowAnyMethod()
@@ -134,7 +135,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    var xmlFile = $"`$`(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name).xml";
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath))
     {
