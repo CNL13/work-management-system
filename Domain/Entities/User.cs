@@ -1,4 +1,4 @@
-﻿namespace WorkManagementSystem.Domain.Entities
+namespace WorkManagementSystem.Domain.Entities
 {
     public class User
     {
@@ -7,8 +7,9 @@
         public string FullName { get; set; } = string.Empty;
         public string EmployeeCode { get; set; } = string.Empty;
         public string PasswordHash { get; set; }
-        public string Role { get; set; }
+        public string Role { get; set; } = "User"; // Admin, Manager, User
         public Guid? UnitId { get; set; }
+        public DateTime JoinedUnitAt { get; set; } = DateTime.UtcNow; // ✅ MỚI: Reset KPI khi đổi phòng ban
         public bool IsApproved { get; set; } = false;
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }

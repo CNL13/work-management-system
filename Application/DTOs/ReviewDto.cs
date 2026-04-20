@@ -1,4 +1,4 @@
-﻿namespace WorkManagementSystem.Application.DTOs
+namespace WorkManagementSystem.Application.DTOs
 {
     public class ReviewDto
     {

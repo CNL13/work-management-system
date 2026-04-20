@@ -1,4 +1,4 @@
-﻿namespace WorkManagementSystem.Domain.Entities
+namespace WorkManagementSystem.Domain.Entities
 {
     public class ReportReview
     {
@@ -7,5 +7,8 @@
         public bool IsApproved { get; set; }
         public string? Comment { get; set; }
         public DateTime ReviewedAt { get; set; }
+        public Guid? ReviewerId { get; set; } // ✅ MỚI
+        public User? Reviewer { get; set; } // ✅ MỚI
+        public Progress? Progress { get; set; } // ✅ MỚI
     }
-}
+}

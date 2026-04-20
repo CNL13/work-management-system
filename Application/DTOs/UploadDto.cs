@@ -1,4 +1,4 @@
-﻿namespace WorkManagementSystem.Application.DTOs
+namespace WorkManagementSystem.Application.DTOs
 {
     public class UploadFileDto
     {
@@ -7,5 +7,6 @@
         public string FilePath { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public Guid? ProgressId { get; set; }
+        public Guid? TaskId { get; set; }
     }
 }

@@ -16,6 +16,7 @@ namespace WorkManagementSystem.Application.DTOs
         public string Description { get; set; } = string.Empty;
 
         public Guid? FileId { get; set; } // ✅ Gắn file khi nộp báo cáo
+        public decimal HoursSpent { get; set; } = 0; // ✅ MỚI
     }
 
     public class ProgressDto
@@ -31,5 +32,8 @@ namespace WorkManagementSystem.Application.DTOs
         public string Status { get; set; } = string.Empty;
         public DateTime UpdatedAt { get; set; }
         public List<UploadFileDto> Files { get; set; } = new();
+        public decimal HoursSpent { get; set; } // ✅ MỚI
+        public string? ReviewComment { get; set; } // ✅ MỚI: Nhận xét chuyên môn từ sếp
+        public string? UnitName { get; set; } // ✅ MỚI: Tên phòng ban (cho lịch sử cá nhân)
     }
 }

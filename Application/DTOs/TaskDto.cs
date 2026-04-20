@@ -14,6 +14,7 @@ namespace WorkManagementSystem.Application.DTOs
         public DateTime? DueDate { get; set; }
         public List<Guid> UserIds { get; set; } = new();
         public List<Guid> UnitIds { get; set; } = new();
+        public decimal EstimatedHours { get; set; } = 0; // ✅ MỚI
     }
 
     public class TaskAssigneeDto
@@ -33,5 +34,12 @@ namespace WorkManagementSystem.Application.DTOs
         public DateTime CreatedAt { get; set; }
         public DateTime? DueDate { get; set; }
         public List<TaskAssigneeDto> Assignees { get; set; } = new(); // ✅ MỚI
+        public List<UploadFileDto> Files { get; set; } = new(); // ✅ MỚI
+        public List<SubTaskDto> SubTasks { get; set; } = new(); // ✅ MỚI
+        public decimal EstimatedHours { get; set; }
+        public decimal ActualHours { get; set; }
+        public Guid? UnitId { get; set; }     // ✅ MỚI
+        public string? UnitName { get; set; } // ✅ MỚI
+        public string? CreatedByName { get; set; } // ✅ MỚI
     }
 }

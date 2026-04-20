@@ -17,7 +17,7 @@ namespace WorkManagementSystem.Application.Services
             _context = context;
         }
 
-        public async Task<UploadFileDto> UploadAsync(IFormFile file, Guid? progressId)
+        public async Task<UploadFileDto> UploadAsync(IFormFile file, Guid? progressId, Guid? taskId)
         {
             if (file == null || file.Length == 0)
                 throw new Exception("File is empty");
@@ -40,7 +40,8 @@ namespace WorkManagementSystem.Application.Services
                 FileName = file.FileName,
                 FilePath = filePath,
                 CreatedAt = DateTime.UtcNow,
-                ProgressId = progressId
+                ProgressId = progressId,
+                TaskId = taskId
             };
 
             _context.UploadFiles.Add(upload);
@@ -52,7 +53,8 @@ namespace WorkManagementSystem.Application.Services
                 FileName = upload.FileName,
                 FilePath = upload.FilePath,
                 CreatedAt = upload.CreatedAt,
-                ProgressId = upload.ProgressId
+                ProgressId = upload.ProgressId,
+                TaskId = upload.TaskId
             };
         }
 
@@ -67,7 +69,8 @@ namespace WorkManagementSystem.Application.Services
                 FileName = upload.FileName,
                 FilePath = upload.FilePath,
                 CreatedAt = upload.CreatedAt,
-                ProgressId = upload.ProgressId
+                ProgressId = upload.ProgressId,
+                TaskId = upload.TaskId
             };
         }
     }

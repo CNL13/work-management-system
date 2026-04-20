@@ -1,4 +1,4 @@
-﻿namespace WorkManagementSystem.Application.DTOs
+namespace WorkManagementSystem.Application.DTOs
 {
     public class DashboardDto
     {
@@ -16,6 +16,7 @@
     public class UnitSummaryDto
     {
         public string UnitName { get; set; } = string.Empty;
+        public string UnitCode { get; set; } = string.Empty;
         public int TotalTasks { get; set; }
         public int ApprovedTasks { get; set; }
     }
@@ -37,6 +38,7 @@
     public class MemberProgressDto
     {
         public string FullName { get; set; } = string.Empty;
+        public string UserEmployeeCode { get; set; } = string.Empty;
         public int TotalTasks { get; set; }
         public int ApprovedTasks { get; set; }
         public int SubmittedTasks { get; set; }

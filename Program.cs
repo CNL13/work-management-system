@@ -13,7 +13,8 @@ using WorkManagementSystem.Application.Services;
 using WorkManagementSystem.Infrastructure.Data;
 using WorkManagementSystem.Infrastructure.Repositories;
 using WorkManagementSystem.Domain.Entities;
-
+using Microsoft.AspNetCore.Http.Features;
+using WorkManagementSystem.API.Hubs; // ✅ MỚI
 
 // ================= SERILOG =================
 Log.Logger = new LoggerConfiguration()
@@ -22,12 +23,12 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Host.UseSerilog();
 
 // ================= SERVICES =================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSignalR(); // ✅ MỚI
 
 // DB
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -36,7 +37,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Repository
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IGenericRepository<TaskHistory>, GenericRepository<TaskHistory>>();
-
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -51,18 +51,33 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IChangePasswordService, ChangePasswordService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<ICommentService, CommentService>(); // ✅ MỚI
+builder.Services.AddScoped<ISubTaskService, SubTaskService>(); // ✅ MỚI
+builder.Services.AddScoped<IGenericRepository<TaskComment>, GenericRepository<TaskComment>>(); // ✅ MỚI
+builder.Services.AddScoped<IGenericRepository<SubTask>, GenericRepository<SubTask>>(); // ✅ MỚI
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// ================= CORS =================  ? TH�M
+// ================= LIMITS =================
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
+});
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10MB
+});
+
+// ================= CORS ================= 
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
         policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials(); // ✅ CẦN CHO SIGNALR
     });
 });
 
@@ -90,9 +105,8 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "WorkManagement API",
         Version = "v1",
-        Description = "API qu?n l� c�ng vi?c v� ti?n ??"
+        Description = "API"
     });
-
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -100,9 +114,8 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Nh?p token d?ng: Bearer {token}"
+        Description = "Nhập token dạng: Bearer {token}"
     });
-
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -118,7 +131,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlFile = $"`$`(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name).xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath))
     {
@@ -129,6 +142,27 @@ builder.Services.AddSwaggerGen(c =>
 // ================= BUILD APP =================
 var app = builder.Build();
 
+// ✅ MỚI: Tự động chạy SQL manual migration cho JoinedUnitAt
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        context.Database.ExecuteSqlRaw(@"
+            IF NOT EXISTS (SELECT * FROM sys.columns 
+                           WHERE object_id = OBJECT_ID(N'[dbo].[Users]') 
+                           AND name = 'JoinedUnitAt')
+            BEGIN
+                ALTER TABLE [dbo].[Users] ADD [JoinedUnitAt] DATETIME2 NOT NULL DEFAULT '2026-01-01';
+            END
+        ");
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Lỗi khi chạy manual migration JoinedUnitAt");
+    }
+}
+
 // ================= MIDDLEWARE =================
 var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "Uploads");
 if (!Directory.Exists(uploadsPath))
@@ -137,22 +171,13 @@ if (!Directory.Exists(uploadsPath))
 }
 
 app.UseStaticFiles();
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(uploadsPath),
-    RequestPath = "/Uploads"
-});
-
-app.UseCors();                          // ? TH�M - ph?i tr??c UseAuthentication
-
+app.UseCors();
 app.UseMiddleware<ExceptionMiddleware>();
-
 app.UseSwagger();
 app.UseSwaggerUI();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
+app.MapHub<DiscussionHub>("/discussionHub"); 
 
 app.Run();

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 #nullable disable
 
 namespace WorkManagementSystem.Migrations
@@ -9,13 +9,42 @@ namespace WorkManagementSystem.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Đã thêm thủ công qua SSMS
+            migrationBuilder.AddColumn<string>(
+                name: "EmployeeCode",
+                table: "Users",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "FullName",
+                table: "Users",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<bool>(
+                name: "IsApproved",
+                table: "Users",
+                type: "bit",
+                nullable: false,
+                defaultValue: false);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // Đã thêm thủ công qua SSMS
+            migrationBuilder.DropColumn(
+                name: "EmployeeCode",
+                table: "Users");
+
+            migrationBuilder.DropColumn(
+                name: "FullName",
+                table: "Users");
+
+            migrationBuilder.DropColumn(
+                name: "IsApproved",
+                table: "Users");
         }
     }
 }

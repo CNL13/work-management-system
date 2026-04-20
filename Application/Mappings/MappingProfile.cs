@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using WorkManagementSystem.Application.DTOs;
 using WorkManagementSystem.Domain.Entities;
 using WorkManagementSystem.Domain.Enums;
@@ -31,12 +31,18 @@ namespace WorkManagementSystem.Application.Mappings
                 .ForMember(dest => dest.EmployeeCode,
                     opt => opt.MapFrom(src => src.EmployeeCode))
                 .ForMember(dest => dest.IsApproved,
-                    opt => opt.MapFrom(src => src.IsApproved));
+                    opt => opt.MapFrom(src => src.IsApproved))
+                .ForMember(dest => dest.PhoneNumber,
+                    opt => opt.MapFrom(src => src.PhoneNumber));
 
             CreateMap<ReportReview, ReviewDto>()
                 .ForMember(dest => dest.ProgressId, opt => opt.MapFrom(src => src.ProgressId))
                 .ForMember(dest => dest.Approve, opt => opt.MapFrom(src => src.IsApproved))
                 .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment));
+
+            CreateMap<UploadFile, UploadFileDto>();
+            CreateMap<TaskComment, CommentDto>();
+            CreateMap<SubTask, SubTaskDto>();
         }
     }
 }

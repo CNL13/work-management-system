@@ -37,7 +37,14 @@ namespace WorkManagementSystem.API.Controllers
             string? role,
             Guid? unitId)
         {
-            var result = await _service.Search(keyword ?? "", role, unitId);
+            var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            var idClaim = User.FindFirst("id")?.Value;
+
+            Guid? managerId = null;
+            if (userRole == "Manager" && Guid.TryParse(idClaim, out var mid))
+                managerId = mid;
+
+            var result = await _service.Search(keyword ?? "", role, unitId, managerId);
             return Ok(result);
         }
 
